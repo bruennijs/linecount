@@ -8,20 +8,23 @@ var flib = require('./lib/filelib'),
     Join = require('join');
 
 
-var nameCountMap = process.argv.slice(2).map(function (path) {
+var nameCountMap = process.argv.slice(2).map(function (filepath) {
   var lineCount;
-  var joiner = Join.create();
-  var cb = joiner.add();
-  new flib.line.counter.create(path).getLineCount(function (count)
+  var join = Join.create();
+  var cb = join.add();
+  new flib.line.counter.create(filepath).getLineCount(function (count)
   {
     lineCount = count;
     cb(count);
   });
 
-  joiner.when(function(arg) {});
-  return lineCount;
+  join.when(function(arg1) {
+    console.log('count in joiner callback arg1 : ' + arg1);
+  });
+
+  return {path: filepath, count: lineCount };
 });
 
-nameCountMap.reduce(function (item) {
-  console.log(' -> ');
+nameCountMap.forEach(function (item) {
+  console.log(item.path + ' -> ' + item.count);
 })
