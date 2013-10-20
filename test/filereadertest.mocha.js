@@ -2,23 +2,35 @@
  * Created by bruentje on 14.10.13.
  */
 
-var ass = require('assert'),
-    filereader = require('./../lib/filereader');
+var assert = require('assert'),
+    should = require('should'),
+    FileLineCounter = require('./../lib/filelib/FileLineCounter'),
+    console = require('console');
 
-describe('filereader', function() {
-  describe('#getLineCount', function() {
-    it('should return correct lines on read', function() {
+describe('FileLineCounter', function () {
+  describe('#getLineCount', function () {
+    it('should return correct lines on read', function (done) {
 
-      var fr = new filereader('./filereader.two_crlf.testfile');
-      fr.getLineCount(function(count) {
-        ass.equal(count, 2);
+      var fr = new FileLineCounter('./test/filereader.two_crlf.testfile');
+      fr.getLineCount(function (count) {
+        count.should.be.equal(2);
+        done();
+      });
+    });
+
+    it('should emit error when file not available', function (done) {
+      var sut = new FileLineCounter('./test/notpresent.txt');
+      sut.on('error', function (err) {
+        err.should.not.empty;
+        done();
       })
 
-    })
-  })
+      sut.getLineCount();
+    });
 
-  describe('#proivate methods not public', function() {
-    var fr = new filereader('./filereader.two_crlf.testfile');
-    ass.equal(typeof fr.ifIsNotOpen, 'function');
-  })
+    it ('should check whether private method defined', function () {
+      var fr = new FileLineCounter('./filereader.two_crlf.testfile');
+      assert.equal(typeof fr.ifIsNotOpen, 'function');
+    })
+  });
 })
