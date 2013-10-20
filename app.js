@@ -3,14 +3,25 @@
  */
 
 var flib = require('./lib/filelib'),
-    console = require('console');
+    console = require('console'),
+    future = require('future'),
+    Join = require('join');
 
-process.argv.forEach(function (val, idx) {
-  if (idx >= 2)
+
+var nameCountMap = process.argv.slice(2).map(function (path) {
+  var lineCount;
+  var joiner = Join.create();
+  var cb = joiner.add();
+  new flib.line.counter.create(path).getLineCount(function (count)
   {
-    new flib.line.counter.create(val).getLineCount(function (count)
-    {
-      console.log(val + ' -> ' + count);
-    });
-  }
+    lineCount = count;
+    cb(count);
+  });
+
+  joiner.when(function(arg) {});
+  return lineCount;
 });
+
+nameCountMap.reduce(function (item) {
+  console.log(' -> ');
+})
