@@ -39,16 +39,18 @@ describe('Q promise based map methods', function () {
 
     var paths = ['./test/filereader.two_crlf.testfile', './test/filereader.3_crlf.testfile'];
 
-    var promisesMap = paths.map(function (path) {
+    var promisesMap = paths.map(function (fpath) {
       var counter = new filelib.line.counter.create();
-      return Q.nfcall(counter.getLineCount, path);
+      return counter.getLineCountP(fpath).then(function (c) {
+        return { path: fpath, count: c };
+      });
     });
 
     var promiseAll = Q.all(promisesMap);
 
-    promiseAll.done(function (counts) {
-      counts.forEach(function (count) {
-        console.log("line count " + count);
+    promiseAll.done(function (maps) {
+      maps.forEach(function (map) {
+        console.log(map.path + ":" + map.count);
       });
     });
   });
